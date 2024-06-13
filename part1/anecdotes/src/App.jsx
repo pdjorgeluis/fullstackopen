@@ -18,6 +18,7 @@ const App = () => {
    
   const [selected, setSelected] = useState(0)
   const [votes, setVotes] = useState(new Array(8).fill(0))
+  const [mostVoted, setMostVoted] = useState({max:0, pos:0})
 
   const setToSelected = ()=> {
     const sel = Math.floor(Math.random() * 8);
@@ -28,6 +29,13 @@ const App = () => {
     const copyOfVotes = [...votes]
     copyOfVotes[selected] += 1
     setVotes(copyOfVotes)
+    if(mostVoted.max < copyOfVotes[selected]){
+      const newMostVoted = {...mostVoted}
+      newMostVoted.max = copyOfVotes[selected]
+      newMostVoted.pos = selected
+      setMostVoted(newMostVoted)
+    }
+      
   }
 
   return (
@@ -37,7 +45,7 @@ const App = () => {
       <button onClick={setToVotes}>vote</button>
       <button onClick={setToSelected}>next anecdote</button>
       <H1Text text='Anecdote with the most votes' />
-      <p>{selected} anecdote has {votes[selected]}</p>
+      <p>{anecdotes[mostVoted.pos]}  has {mostVoted.max} votes</p>
     </div>
   )
 }
