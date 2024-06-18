@@ -15,8 +15,6 @@ const Filter = ( {newFilter, onFilterChange} ) => {
 }
 
 const PersonForm = ({onSubmit, newName, newNumber, onNewNameChange, onNewNumberChange}) => {
-        //<Input text={'name'} value={newName} onChange={handleNewNameChange} />
-        //<Input text={'number'} value={newNumber} onChange={handleNewNumberChange} />
   return(
     <div>
       <form onSubmit={onSubmit}>
@@ -31,7 +29,6 @@ const PersonForm = ({onSubmit, newName, newNumber, onNewNameChange, onNewNumberC
 }
 
 const Persons = ( {personsToShow, onDelete} ) => {
-  if(personsToShow)
     return (
     <div>
       {personsToShow.map(person => 
@@ -41,17 +38,26 @@ const Persons = ( {personsToShow, onDelete} ) => {
       </p>)}
       
     </div>)
-  else
-    return <div>Phonebook is empty</div> // check this
 }
 
+const Notification = ({ message, messageStyle }) => {
+  if(message === null) {
+    return null
+  }
+  return (
+    <div className={messageStyle}>
+      {message}
+    </div>
+  )  
+}
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
-  //const [personsToShow, setPersonsToShow] = useState({})
+  const [errorMessage, setErrorMessage] = useState('some error happened...')
+  const [messageStyle, setMessageStyle] = useState('')
 
   useEffect(() => {
     console.log('effect');
@@ -61,7 +67,14 @@ const App = () => {
         setPersons(initialPersons)
       })
       .catch(error => {
-        console.log('fail')
+        console.log(error.response.data.error);
+        setMessageStyle('error')
+        setErrorMessage(
+          `Error: ${error.response.data.error}`
+        )
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
       })
   }, [])
 
@@ -76,16 +89,29 @@ const App = () => {
       if(!found){
         const id = persons.length + 1
         const newPerson = {name: newName, number: newNumber, id: `${id}`}
-        //setPersons(persons.concat(newPerson))
         personService
           .create(newPerson)
           .then(createdPerson => {
             setPersons(persons.concat(createdPerson))
             setNewName('')
             setNewNumber('')
+            setMessageStyle('notification')
+            setErrorMessage(
+              `Added ${createdPerson.name}`
+            )
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
           })
           .catch(error => {
             console.log(error.response.data.error);
+            setMessageStyle('error')
+            setErrorMessage(
+              `Error: ${error.response.data.error}`
+            )
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
           })
       }else{
         if(window.confirm(`${found.name} is already added to phonebook, replace the old number with a new one?`)){
@@ -98,7 +124,14 @@ const App = () => {
               setNewNumber('')
             })
             .catch(error => {
-              console.log(`Information of ${found.id} have already been removed from the server`);
+              console.log(error.response.data.error);
+              setMessageStyle('error')
+              setErrorMessage(
+                `Information of ${found.name} have already been removed from the server`
+              )
+              setTimeout(() => {
+                setErrorMessage(null)
+              }, 5000)
             })
         }
       } 
@@ -117,6 +150,13 @@ const App = () => {
       })
       .catch(error => {
         console.log(error.response.data.error);
+        setMessageStyle('error')
+        setErrorMessage(
+          `Error: ${error.response.data.error}`
+        )
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
       })
   }
 
@@ -126,7 +166,6 @@ const App = () => {
 
   const handleFilterChange = (event) => {
     setNewFilter(event.target.value)
-    //setPersonsToShow(persons.filter(person => person.name.includes(newFilter)))
   }
 
   const handleDeletePerson = (person) => {
@@ -141,6 +180,7 @@ const App = () => {
   return (
     <div>
       <Header text={'Phonebook'} />
+      <Notification message={errorMessage} messageStyle={messageStyle} />
       <Filter newFilter={newFilter} onFilterChange={handleFilterChange} />
       <Header text={'add a new'} />
       <PersonForm onSubmit={addPerson} newName={newName} newNumber={newNumber} onNewNameChange={handleNewNameChange} onNewNumberChange={handleNewNumberChange} />
