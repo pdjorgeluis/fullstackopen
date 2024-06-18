@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
-import axios from 'axios'
 
 const Header = ( {text} ) => {
   return <h2>{text}</h2>
@@ -122,6 +121,13 @@ const App = () => {
               setPersons(persons.map(person => person.id != updatedPerson.id ? person : updatedPerson))
               setNewName('')
               setNewNumber('')
+              setMessageStyle('notification')
+              setErrorMessage(
+                `Updated number of ${updatedPerson.name}`
+              )
+              setTimeout(() => {
+                setErrorMessage(null)
+              }, 5000)
             })
             .catch(error => {
               console.log(error.response.data.error);
@@ -136,7 +142,7 @@ const App = () => {
         }
       } 
     }else{
-      window.alert('Please fill the camps')
+      window.alert('Please fill the fields')
     }
   }
 
@@ -144,9 +150,14 @@ const App = () => {
     personService
       .deletePerson(id)
       .then(deletedPerson => {
-        console.log(deletedPerson);
-        setPersons(persons.filter(person => person.id != id))
-        console.log(`deleted ${deletedPerson.id}`);
+        setPersons(persons.filter(person => person.id != deletedPerson.id))
+        setMessageStyle('notification')
+        setErrorMessage(
+          `Deleted ${deletedPerson.name}`
+        )
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
       })
       .catch(error => {
         console.log(error.response.data.error);
@@ -169,8 +180,8 @@ const App = () => {
   }
 
   const handleDeletePerson = (person) => {
-    console.log('delete clicked' + person.id);
-    if(window.confirm(`Delete ${person.name}?`)) deletePerson(person.id) 
+    if(window.confirm(`Delete ${person.name}?`)) 
+      deletePerson(person.id) 
   }
 
   const personsToShow = newFilter !== ''
