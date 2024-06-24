@@ -1,4 +1,5 @@
 # fullstackopen
 Exercise submissions for fullstackopen course
-phonebook application deployed using Fly at 
+<p>phonebook application deployed using Fly at <br /> 
   https://phonebook-backend-hidden-mountain-4570.fly.dev/
+</p>
