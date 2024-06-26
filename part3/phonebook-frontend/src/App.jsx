@@ -55,7 +55,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
-  const [errorMessage, setErrorMessage] = useState('some error happened...') //Change this
+  const [errorMessage, setErrorMessage] = useState('')
   const [messageStyle, setMessageStyle] = useState('')
 
   useEffect(() => {
@@ -150,7 +150,9 @@ const App = () => {
     personService
       .deletePerson(id)
       .then(deletedPerson => {
-        setPersons(persons.filter(person => person.id != deletedPerson.id))
+        setPersons(persons.filter(person => {
+          return person.id != deletedPerson.id
+        }))
         setMessageStyle('notification')
         setErrorMessage(
           `Deleted ${deletedPerson.name}`
