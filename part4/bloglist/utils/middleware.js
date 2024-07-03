@@ -34,17 +34,30 @@ const errorHandler = (error, request, response, next) => {
 }
 
 const tokenExtractor = (request, response, next) => {
-  const authorization = request.get('authorization')
-  if(authorization && authorization.startsWith('Bearer ')) {
-    request.token = authorization.replace('Bearer ', '')
-    next()
+  if (request.method === "POST") {
+    const authorization = request.get("authorization");
+    if (!authorization || !authorization.startsWith("Bearer ")) {
+      console.log(" failed!!!: token missing");
+      return response.status(401).json({ error: "Token missing or invalid" });
+    }
+
+    request.token = authorization.replace("Bearer ", "");
   }
-  return null
+
+  next();
+
 }
 
 const userExtractor = (request, response, next) => {
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  request.user = decodedToken.id 
+  if (request.method === "POST"){
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    request.user = decodedToken.id 
+  }
+  next()
+}
+
+const tempMiddleware = (request, response, next) => {
+
   next()
 }
 
