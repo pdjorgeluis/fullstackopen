@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
 import Alert from './components/Alert'
 import LoginForm from './components/LoginForm'
-import LogoutForm from './components/LogoutForm'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 
@@ -19,6 +18,7 @@ const App = () => {
   //const [url, setUrl] = useState('')
   const [alert, setAlert] = useState(null)
 
+  const blogFormRef = useRef()
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBloglistAppUser')
@@ -137,7 +137,7 @@ const App = () => {
   }*/
 
   const loginForm = () => {
-    
+
     if (user === null){
         return(
         <LoginForm 
@@ -149,22 +149,41 @@ const App = () => {
         />      
       )
     }
-    return (
+   /* return (
       <div>
-        <LogoutForm handleOnclick={handleLogout} user={user} />
+        <h2>blogs</h2>
+        <p>
+          {user.name} logged in <button onClick={handleLogout}>logout</button>
+        </p>
         <BlogForm createBlog={createBlog} setAlert={setAlert} />
         {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />
         )}
       </div>
       
-    )
+    )*/
     
   }
 
   return (
     <div>
       <Alert alert={alert} />
+      {!user && loginForm()}
+      {user && <div>
+        <h2>blogs</h2>
+        <p>
+          {user.name} logged in <button onClick={handleLogout}>logout</button>
+        </p>
+
+        <Togglable buttonLabel='new blog' ref={blogFormRef}>
+          <BlogForm createBlog={createBlog} setAlert={setAlert} />
+        </Togglable>
+
+        {blogs.map(blog =>
+          <Blog key={blog.id} blog={blog} />
+        )}
+        </div>        
+      }
       {loginForm()}
     </div>
     
