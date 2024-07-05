@@ -5,7 +5,7 @@ const BlogForm = ({ createBlog, setAlert }) => {
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
 
-  const handleCreate = async (event) => {
+  const handleCreate = (event) => {
 
     event.preventDefault()
     if (title && author && url){

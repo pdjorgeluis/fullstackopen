@@ -10,6 +10,7 @@ import Togglable from './components/Togglable'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
+  const [users, setUsers] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -72,28 +73,48 @@ const App = () => {
   }
 
   const createBlog = async (blogObject) => {
-      try {
-        const createdBlog = await blogService.create(blogObject)
-        setBlogs(blogs.concat(createdBlog))
+    try {
+      const createdBlog = await blogService.create(blogObject)
+      setBlogs(blogs.concat(createdBlog))
 
-        setAlert({
-                      message: `a new blog ${createdBlog.title} by ${createdBlog.author} added`, 
-                      typeOfAlert: 'notification'
-                    })
-        setTimeout(() => {
-          setAlert(null)
-        }, 5000)
-        
-      } catch (exception) {
-        console.log(exception.message);
-        setMessage({ text: exception.message, typeOfMessage: 'error' })
-        setTimeout(() => {
-          setMessage(null)
-        }, 5000)
-      }
+      setAlert({
+                    message: `a new blog ${createdBlog.title} by ${createdBlog.author} added`, 
+                    typeOfAlert: 'notification'
+                  })
+      setTimeout(() => {
+        setAlert(null)
+      }, 5000)
+      
+    } catch (exception) {
+      console.log(exception.message);
+      setMessage({ text: exception.message, typeOfMessage: 'error' })
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+    }
     
   }
 
+  const updateBlog = async (id, blogObject) => {
+    try {
+      const updatedBlog = await blogService.update(id, blogObject)
+      
+      //setBlogs(blogs.map(blog => blog.id !== id ? blog : updatedBlog))
+      setBlogs( await blogService.getAll())
+      setAlert({
+        message: `likes in blog ${updatedBlog.title} updated`, 
+        typeOfAlert: 'notification'
+      })
+      setTimeout(() => {
+        setAlert(null)
+      }, 5000)
+    } catch (exception) {
+      setMessage({ alert: exception.message, typeOfMessage: 'error' })
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+    }
+  }
   
  /*
   const blogForm = () => (
@@ -180,11 +201,10 @@ const App = () => {
         </Togglable>
 
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
         )}
         </div>        
       }
-      {loginForm()}
     </div>
     
   )
