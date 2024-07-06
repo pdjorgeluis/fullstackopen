@@ -34,7 +34,7 @@ const errorHandler = (error, request, response, next) => {
 }
 
 const tokenExtractor = (request, response, next) => {
-  if (request.method === "POST") {
+  if (request.method !== "GET") {
     const authorization = request.get("authorization");
     if (!authorization || !authorization.startsWith("Bearer ")) {
       console.log(" failed!!!: token missing");
@@ -49,17 +49,13 @@ const tokenExtractor = (request, response, next) => {
 }
 
 const userExtractor = (request, response, next) => {
-  if (request.method === "POST"){
+  if (request.method !== "GET"){
     const decodedToken = jwt.verify(request.token, process.env.SECRET)
     request.user = decodedToken.id 
   }
   next()
 }
 
-const tempMiddleware = (request, response, next) => {
-
-  next()
-}
 
 module.exports = {
   requestLogger,

@@ -10,7 +10,6 @@ import Togglable from './components/Togglable'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [users, setUsers] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -31,8 +30,11 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
+    blogService.getAll().then(blogs => {
+      blogs.sort((a, b) => b.likes - a.likes)
       setBlogs( blogs )
+    }
+      
     )  
   }, [])
 
@@ -75,8 +77,9 @@ const App = () => {
   const createBlog = async (blogObject) => {
     try {
       const createdBlog = await blogService.create(blogObject)
-      setBlogs(blogs.concat(createdBlog))
-
+      const cblogs = await blogService.getAll()
+      //const cblogs = blogs.concat(createdBlog)
+      setBlogs(cblogs.sort((a, b) => b.likes - a.likes))
       setAlert({
                     message: `a new blog ${createdBlog.title} by ${createdBlog.author} added`, 
                     typeOfAlert: 'notification'
@@ -98,9 +101,9 @@ const App = () => {
   const updateBlog = async (id, blogObject) => {
     try {
       const updatedBlog = await blogService.update(id, blogObject)
-      
-      //setBlogs(blogs.map(blog => blog.id !== id ? blog : updatedBlog))
-      setBlogs( await blogService.getAll())
+ 
+      const ublogs = await blogService.getAll()
+      setBlogs( ublogs.sort((a, b) => b.likes - a.likes))
       setAlert({
         message: `likes in blog ${updatedBlog.title} updated`, 
         typeOfAlert: 'notification'
@@ -109,13 +112,35 @@ const App = () => {
         setAlert(null)
       }, 5000)
     } catch (exception) {
-      setMessage({ alert: exception.message, typeOfMessage: 'error' })
+      setAlert({ alert: exception.message, typeOfMessage: 'error' })
       setTimeout(() => {
-        setMessage(null)
+        setAlert(null)
       }, 5000)
     }
   }
   
+  const removeBlog = async (id) => {
+    try {
+      console.log('the id ',id);
+      const deletedBlog = await blogService.deleteBlog(id)
+      const dblogs = await blogService.getAll()
+      //const listBlogs = blogs.filter(blog => blog.id != deletedBlog.id)
+      
+      setBlogs(dblogs.sort((a, b) => b.likes - a.likes))
+      setAlert({
+        message: `Removed blog ${deletedBlog.title}`, 
+        typeOfAlert: 'notification'
+      })
+      setTimeout(() => {
+        setAlert(null)
+      }, 5000)
+    } catch (exception) {
+      setAlert({ alert: exception.message, typeOfMessage: 'error' })
+      setTimeout(() => {
+        setAlert(null)
+      }, 5000)
+    }
+  }
  /*
   const blogForm = () => (
     <div>
@@ -201,7 +226,11 @@ const App = () => {
         </Togglable>
 
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
+          <Blog key={blog.id} blog={blog} 
+            updateBlog={updateBlog} 
+            removeBlog={removeBlog} 
+            user={user} 
+          />
         )}
         </div>        
       }
