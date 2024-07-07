@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react'
 
 const BlogForm = ({ createBlog, setAlert }) => {
   const [title, setTitle] = useState('')
@@ -23,11 +23,10 @@ const BlogForm = ({ createBlog, setAlert }) => {
       setUrl('')
     }else{
       setAlert({ message: 'fill all the fields', typeOfAlert: 'error' })
-        setTimeout(() => {
-          setAlert(null)
-        }, 5000)
+      setTimeout(() => {
+        setAlert(null)
+      }, 5000)
     }
-    
   }
 
   return(
@@ -36,28 +35,28 @@ const BlogForm = ({ createBlog, setAlert }) => {
       <form onSubmit={handleCreate}>
         <div>
           title:
-            <input
+          <input
             type='text'
             value={title}
             name='Title'
-            onChange={({target}) => setTitle(target.value)}
-            /> <br/>
+            onChange={({ target }) => setTitle(target.value)}
+          /> <br/>
             author:
-            <input
+          <input
             type='text'
             value={author}
             name='Author'
-            onChange={({target}) => setAuthor(target.value)}
-            /> <br/>
+            onChange={({ target }) => setAuthor(target.value)}
+          /> <br/>
             url:
-            <input
+          <input
             type='text'
             value={url}
             name='Url'
-            onChange={({target}) => setUrl(target.value)}
-            /> <br/>
-            <button onClick={handleCreate}>create</button>
-        </div>    
+            onChange={({ target }) => setUrl(target.value)}
+          /> <br/>
+          <button onClick={handleCreate}>create</button>
+        </div>
       </form>
     </div>
   )

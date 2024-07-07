@@ -13,7 +13,7 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
- // const [title, setTitle] = useState('')
+  // const [title, setTitle] = useState('')
   //const [author, setAuthor] = useState('')
   //const [url, setUrl] = useState('')
   const [alert, setAlert] = useState(null)
@@ -34,12 +34,12 @@ const App = () => {
       blogs.sort((a, b) => b.likes - a.likes)
       setBlogs( blogs )
     }
-      
-    )  
+
+    )
   }, [])
 
 
- const handleLogin = async (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault()
 
     try {
@@ -54,8 +54,8 @@ const App = () => {
         setAlert(null)
       }, 5000)
     } catch (exception) {
-      console.log(exception.message);
-      setAlert({ alert:'wrong username or password', typeOfAlert: 'error'})
+      console.log(exception.message)
+      setAlert({ alert:'wrong username or password', typeOfAlert: 'error' })
       setTimeout(() => {
         setAlert(null)
       }, 5000)
@@ -71,7 +71,7 @@ const App = () => {
     setTimeout(() => {
       setAlert(null)
     }, 5000)
-    
+
   }
 
   const createBlog = async (blogObject) => {
@@ -81,31 +81,31 @@ const App = () => {
       //const cblogs = blogs.concat(createdBlog)
       setBlogs(cblogs.sort((a, b) => b.likes - a.likes))
       setAlert({
-                    message: `a new blog ${createdBlog.title} by ${createdBlog.author} added`, 
-                    typeOfAlert: 'notification'
-                  })
+        message: `a new blog ${createdBlog.title} by ${createdBlog.author} added`,
+        typeOfAlert: 'notification'
+      })
       setTimeout(() => {
         setAlert(null)
       }, 5000)
-      
+
     } catch (exception) {
-      console.log(exception.message);
-      setMessage({ text: exception.message, typeOfMessage: 'error' })
+      console.log(exception.message)
+      setAlert({ alert: exception.alert, typeOfMessage: 'error' })
       setTimeout(() => {
-        setMessage(null)
+        setAlert(null)
       }, 5000)
     }
-    
+
   }
 
   const updateBlog = async (id, blogObject) => {
     try {
       const updatedBlog = await blogService.update(id, blogObject)
- 
+
       const ublogs = await blogService.getAll()
       setBlogs( ublogs.sort((a, b) => b.likes - a.likes))
       setAlert({
-        message: `likes in blog ${updatedBlog.title} updated`, 
+        message: `likes in blog ${updatedBlog.title} updated`,
         typeOfAlert: 'notification'
       })
       setTimeout(() => {
@@ -118,17 +118,17 @@ const App = () => {
       }, 5000)
     }
   }
-  
+
   const removeBlog = async (id) => {
     try {
-      console.log('the id ',id);
+      console.log('the id ',id)
       const deletedBlog = await blogService.deleteBlog(id)
       const dblogs = await blogService.getAll()
       //const listBlogs = blogs.filter(blog => blog.id != deletedBlog.id)
-      
+
       setBlogs(dblogs.sort((a, b) => b.likes - a.likes))
       setAlert({
-        message: `Removed blog ${deletedBlog.title}`, 
+        message: `Removed blog ${deletedBlog.title}`,
         typeOfAlert: 'notification'
       })
       setTimeout(() => {
@@ -141,7 +141,7 @@ const App = () => {
       }, 5000)
     }
   }
- /*
+  /*
   const blogForm = () => (
     <div>
       <h2>create new</h2>
@@ -169,7 +169,7 @@ const App = () => {
             onChange={({target}) => setUrl(target.value)}
             /> <br/>
             <button onClick={handleCreate}>create</button>
-        </div>    
+        </div>
       </form>
     </div>
   )
@@ -185,17 +185,17 @@ const App = () => {
   const loginForm = () => {
 
     if (user === null){
-        return(
-        <LoginForm 
-          handleSubmit={handleLogin} 
+      return(
+        <LoginForm
+          handleSubmit={handleLogin}
           setUsername={setUsername}
           setPassword={setPassword}
           username={username}
           password={password}
-        />      
+        />
       )
     }
-   /* return (
+    /* return (
       <div>
         <h2>blogs</h2>
         <p>
@@ -206,9 +206,9 @@ const App = () => {
           <Blog key={blog.id} blog={blog} />
         )}
       </div>
-      
+
     )*/
-    
+
   }
 
   return (
@@ -226,16 +226,16 @@ const App = () => {
         </Togglable>
 
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} 
-            updateBlog={updateBlog} 
-            removeBlog={removeBlog} 
-            user={user} 
+          <Blog key={blog.id} blog={blog}
+            updateBlog={updateBlog}
+            removeBlog={removeBlog}
+            user={user}
           />
         )}
-        </div>        
+      </div>
       }
     </div>
-    
+
   )
 }
 
