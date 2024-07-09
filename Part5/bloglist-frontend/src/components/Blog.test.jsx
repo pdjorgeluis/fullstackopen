@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
+import { test } from 'vitest'
 
 describe('<Blog />', () => {
   const blog = {
@@ -40,5 +41,18 @@ describe('<Blog />', () => {
 
     const div = container.querySelector('.blogDetails')
     expect(div).not.toHaveStyle('display: none')
+  })
+
+  test('clicking the button like, calls event handler once', async () => {
+    const mockHandler = vi.fn()
+    render(<Blog blog={blog} updateBlog={mockHandler}/>)
+
+    const user = userEvent.setup()
+    const buttonViewHide = screen.getByText('view')
+    const buttonLike = screen.getByText('like')
+    await user.click(buttonViewHide)
+    await user.click(buttonLike)
+    await user.click(buttonLike)
+    expect(mockHandler.mock.calls).toHaveLength(2)
   })
 })
