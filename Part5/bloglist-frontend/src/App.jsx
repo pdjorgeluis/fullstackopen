@@ -229,7 +229,7 @@ const App = () => {
           <Blog key={blog.id} blog={blog}
             updateBlog={updateBlog}
             removeBlog={removeBlog}
-            user={user}
+            username={user.username}
           />
         )}
       </div>
