@@ -36,6 +36,7 @@ const BlogForm = ({ createBlog, setAlert }) => {
         <div>
           title:
           <input
+            id='title'
             type='text'
             value={title}
             name='Title'
@@ -43,6 +44,7 @@ const BlogForm = ({ createBlog, setAlert }) => {
           /> <br/>
             author:
           <input
+            id='author'
             type='text'
             value={author}
             name='Author'
@@ -50,12 +52,13 @@ const BlogForm = ({ createBlog, setAlert }) => {
           /> <br/>
             url:
           <input
+            id='url'
             type='text'
             value={url}
             name='Url'
             onChange={({ target }) => setUrl(target.value)}
           /> <br/>
-          <button onClick={handleCreate}>create</button>
+          <button id='button-create' onClick={handleCreate}>create</button>
         </div>
       </form>
     </div>

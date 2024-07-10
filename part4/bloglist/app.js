@@ -14,7 +14,7 @@ mongoose.set('strictQuery', false)
 
 logger.info('connecting to', config.MONGODB_URL)
 
-mongoose.connect(config.MONGODB_URL)
+mongoose.connect(config.MONGODB_URL)  
   .then(() => {
     logger.info('connected to MongoDB')
   })
@@ -27,9 +27,14 @@ app.use(express.json())
 app.use(middleware.requestLogger)
 //app.use(middleware.tokenExtractor)
 
-app.use('/api/blogs', middleware.tokenExtractor, middleware.userExtractor, blogsRouter) 
-app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
+app.use('/api/users', usersRouter)
+app.use('/api/blogs', middleware.tokenExtractor, middleware.userExtractor, blogsRouter) 
+
+if (process.env.NODE_ENV === 'test'){
+  const testingRouter = require('./controllers/testing')
+  app.use('/api/testing', testingRouter)
+}
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)

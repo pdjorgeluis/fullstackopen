@@ -55,7 +55,7 @@ const App = () => {
       }, 5000)
     } catch (exception) {
       console.log(exception.message)
-      setAlert({ alert:'wrong username or password', typeOfAlert: 'error' })
+      setAlert({ message:'wrong credentials', typeOfAlert: 'error' })
       setTimeout(() => {
         setAlert(null)
       }, 5000)
