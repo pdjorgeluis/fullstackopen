@@ -12,7 +12,7 @@ const BlogForm = ({ createBlog, setAlert }) => {
 
       const blogObject = {
         title: title,
-        author: author, //change to user.name?
+        author: author,
         url: url
       }
 

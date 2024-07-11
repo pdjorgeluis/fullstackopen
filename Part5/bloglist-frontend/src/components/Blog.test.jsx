@@ -43,7 +43,7 @@ describe('<Blog />', () => {
     expect(div).not.toHaveStyle('display: none')
   })
 
-  test('clicking the button like, calls event handler once', async () => {
+  test('clicking the button like, calls event handler twice', async () => {
     const mockHandler = vi.fn()
     render(<Blog blog={blog} updateBlog={mockHandler}/>)
 

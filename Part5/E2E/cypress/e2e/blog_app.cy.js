@@ -129,7 +129,7 @@ describe('Blog app', function() {
         cy.get('#button-create').click()
 
       })
-      it('Blogs are ordered by most likes', function() {
+      it('Blogs are ordered by most liked', function() {
         //Clicking view button
         cy.get('.blog').eq(0).contains('view').click()
         cy.get('.blog').eq(1).contains('view').click()

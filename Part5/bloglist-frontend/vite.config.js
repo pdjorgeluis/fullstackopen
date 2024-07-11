@@ -11,7 +11,7 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
-    host: '127.0.0.1'//make conditional in .env
+    host: '127.0.0.1'
   },
   test: {
     environment: 'jsdom',

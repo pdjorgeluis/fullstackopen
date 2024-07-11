@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import BlogForm from './BlogForm'
 import userEvent from '@testing-library/user-event'
 
-test('<NBlogForm /> updates parent state and calls onSubmit', async () => {
+test('<BlogForm /> updates parent state and calls onSubmit', async () => {
   const createBlog = vi.fn()
   const user = userEvent.setup()
 

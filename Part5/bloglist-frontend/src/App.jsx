@@ -13,9 +13,6 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  // const [title, setTitle] = useState('')
-  //const [author, setAuthor] = useState('')
-  //const [url, setUrl] = useState('')
   const [alert, setAlert] = useState(null)
 
   const blogFormRef = useRef()
@@ -78,7 +75,6 @@ const App = () => {
     try {
       const createdBlog = await blogService.create(blogObject)
       const cblogs = await blogService.getAll()
-      //const cblogs = blogs.concat(createdBlog)
       setBlogs(cblogs.sort((a, b) => b.likes - a.likes))
       setAlert({
         message: `a new blog ${createdBlog.title} by ${createdBlog.author} added`,
@@ -124,7 +120,6 @@ const App = () => {
       console.log('the id ',id)
       const deletedBlog = await blogService.deleteBlog(id)
       const dblogs = await blogService.getAll()
-      //const listBlogs = blogs.filter(blog => blog.id != deletedBlog.id)
 
       setBlogs(dblogs.sort((a, b) => b.likes - a.likes))
       setAlert({
@@ -141,46 +136,6 @@ const App = () => {
       }, 5000)
     }
   }
-  /*
-  const blogForm = () => (
-    <div>
-      <h2>create new</h2>
-      <form onSubmit={handleCreate}>
-        <div>
-          title:
-            <input
-            type='text'
-            value={title}
-            name='Title'
-            onChange={({target}) => setTitle(target.value)}
-            /> <br/>
-            author:
-            <input
-            type='text'
-            value={author}
-            name='Author'
-            onChange={({target}) => setAuthor(target.value)}
-            /> <br/>
-            url:
-            <input
-            type='text'
-            value={url}
-            name='Url'
-            onChange={({target}) => setUrl(target.value)}
-            /> <br/>
-            <button onClick={handleCreate}>create</button>
-        </div>
-      </form>
-    </div>
-  )
-
-  const messages = () => {
-    if(message !== null){
-      return (
-        <p className={message.typeOfMessage}>{message.text}</p>
-      )
-    }
-  }*/
 
   const loginForm = () => {
 
@@ -195,20 +150,6 @@ const App = () => {
         />
       )
     }
-    /* return (
-      <div>
-        <h2>blogs</h2>
-        <p>
-          {user.name} logged in <button onClick={handleLogout}>logout</button>
-        </p>
-        <BlogForm createBlog={createBlog} setAlert={setAlert} />
-        {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
-        )}
-      </div>
-
-    )*/
-
   }
 
   return (
@@ -235,7 +176,6 @@ const App = () => {
       </div>
       }
     </div>
-
   )
 }
 
