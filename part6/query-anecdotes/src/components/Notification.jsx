@@ -1,4 +1,3 @@
-import { useCallback } from "react"
 import { useNotificationText} from '../AnecdotesContext'
 
 const Notification = () => {

@@ -31,14 +31,5 @@ export const useNotificationDispatch = () => {
   const notificationAndDispatch = useContext(AnecdotesContext)
   return notificationAndDispatch[1]
 }
-/*
-export const setNotification = (content, seconds) => {
-  return dispatch => {
-    useNotificationDispatch({type:'SHOW'})
-    setTimeout(() => {
-      useNotificationDispatch({type:'HIDE'})
-    }, seconds*1000)
-  }
-}*/
 
 export default AnecdotesContext

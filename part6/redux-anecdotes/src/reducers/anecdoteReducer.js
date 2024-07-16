@@ -20,7 +20,7 @@ const asObject = (anecdote) => {
   }
 }
 
-const initialState = anecdotesAtStart.map(asObject) //Not used after fetching from server
+const initialState = anecdotesAtStart.map(asObject)
 
 const anecdoteSlice = createSlice({
   name: 'anecdote',
@@ -33,14 +33,6 @@ const anecdoteSlice = createSlice({
       const newState = state.map(anecdote => anecdote.id !== id ? anecdote : changedAnecdote)
       return [...newState].sort((a, b) => b.votes - a.votes)
     },
-    /*createAnecdote(state, action){
-      const newAnecdote = {
-        content: action.payload,
-        //id: getId(),
-        votes: 0
-      }
-      return [...state, action.payload] //state.push(newAnecdote)
-    },*/
     appendAnecdote(state, action) {
       state.push(action.payload)
     },
