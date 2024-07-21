@@ -7,19 +7,24 @@ import Alert from './components/Alert'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
+import Notification from './components/Notification'
+
+import { useDispatch } from 'react-redux'
+import { setNotification } from './reducers/notificationReducer'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [alert, setAlert] = useState(null)
+  //const [alert, setAlert] = useState(null)
 
   const blogFormRef = useRef()
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBloglistAppUser')
-    if(loggedUserJSON) {
+    if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
       blogService.setToken(user.token)
@@ -27,35 +32,37 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    blogService.getAll().then(blogs => {
+    blogService.getAll().then((blogs) => {
       blogs.sort((a, b) => b.likes - a.likes)
-      setBlogs( blogs )
-    }
-
-    )
+      setBlogs(blogs)
+    })
   }, [])
-
 
   const handleLogin = async (event) => {
     event.preventDefault()
 
     try {
       const user = await loginService.login({ username, password })
-      window.localStorage.setItem('loggedBloglistAppUser', JSON.stringify(user))
+      window.localStorage.setItem(
+        'loggedBloglistAppUser',
+        JSON.stringify(user)
+      )
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
-      setAlert({ message:`Logged in ${user. name}`, typeOfAlert: 'notification' })
+      /*setAlert({ message:`Logged in ${user. name}`, typeOfAlert: 'notification' })
       setTimeout(() => {
         setAlert(null)
-      }, 5000)
+      }, 5000)*/
+      dispatch(setNotification(`Logged in ${user.name}`, 5))
     } catch (exception) {
       console.log(exception.message)
-      setAlert({ message:'wrong credentials', typeOfAlert: 'error' })
+      /*setAlert({ message:'wrong credentials', typeOfAlert: 'error' })
       setTimeout(() => {
         setAlert(null)
-      }, 5000)
+      }, 5000)*/
+      dispatch(setNotification('wrong credentials', 5))
     }
   }
 
@@ -64,11 +71,11 @@ const App = () => {
     setUser(null)
     setUsername('')
     setPassword('')
-    setAlert({ message:`Logged out ${user. name}`, typeOfAlert: 'notification' })
+    /*setAlert({ message:`Logged out ${user. name}`, typeOfAlert: 'notification' })
     setTimeout(() => {
       setAlert(null)
-    }, 5000)
-
+    }, 5000)*/
+    dispatch(setNotification(`Logged out ${user.name}`, 5))
   }
 
   const createBlog = async (blogObject) => {
@@ -76,22 +83,27 @@ const App = () => {
       const createdBlog = await blogService.create(blogObject)
       const cblogs = await blogService.getAll()
       setBlogs(cblogs.sort((a, b) => b.likes - a.likes))
-      setAlert({
+      /*setAlert({
         message: `a new blog ${createdBlog.title} by ${createdBlog.author} added`,
         typeOfAlert: 'notification'
       })
       setTimeout(() => {
         setAlert(null)
-      }, 5000)
-
+      }, 5000)*/
+      dispatch(
+        setNotification(
+          `a new blog ${createdBlog.title} by ${createdBlog.author} added`,
+          5
+        )
+      )
     } catch (exception) {
       console.log(exception.message)
-      setAlert({ alert: exception.alert, typeOfMessage: 'error' })
+      /*setAlert({ alert: exception.message, typeOfMessage: 'error' })
       setTimeout(() => {
         setAlert(null)
-      }, 5000)
+      }, 5000)*/
+      dispatch(setNotification(exception.message, 5))
     }
-
   }
 
   const updateBlog = async (id, blogObject) => {
@@ -99,48 +111,53 @@ const App = () => {
       const updatedBlog = await blogService.update(id, blogObject)
 
       const ublogs = await blogService.getAll()
-      setBlogs( ublogs.sort((a, b) => b.likes - a.likes))
-      setAlert({
+      setBlogs(ublogs.sort((a, b) => b.likes - a.likes))
+      /*setAlert({
         message: `likes in blog ${updatedBlog.title} updated`,
         typeOfAlert: 'notification'
       })
       setTimeout(() => {
         setAlert(null)
-      }, 5000)
+      }, 5000)*/
+      dispatch(
+        setNotification(`likes in blog ${updatedBlog.title} updated`, 5)
+      )
     } catch (exception) {
-      setAlert({ alert: exception.message, typeOfMessage: 'error' })
+      /*setAlert({ alert: exception.message, typeOfMessage: 'error' })
       setTimeout(() => {
         setAlert(null)
-      }, 5000)
+      }, 5000)*/
+      dispatch(setNotification(exception.message, 5))
     }
   }
 
   const removeBlog = async (id) => {
     try {
-      console.log('the id ',id)
+      console.log('the id ', id)
       const deletedBlog = await blogService.deleteBlog(id)
       const dblogs = await blogService.getAll()
 
       setBlogs(dblogs.sort((a, b) => b.likes - a.likes))
-      setAlert({
+      /*setAlert({
         message: `Removed blog ${deletedBlog.title}`,
         typeOfAlert: 'notification'
       })
       setTimeout(() => {
         setAlert(null)
-      }, 5000)
+      }, 5000)*/
+      dispatch(setNotification(`Removed blog ${deletedBlog.title}`, 5))
     } catch (exception) {
-      setAlert({ alert: exception.message, typeOfMessage: 'error' })
+      /*setAlert({ alert: exception.message, typeOfMessage: 'error' })
       setTimeout(() => {
         setAlert(null)
-      }, 5000)
+      }, 5000)*/
+      dispatch(setNotification(exception.message, 5))
     }
   }
 
   const loginForm = () => {
-
-    if (user === null){
-      return(
+    if (user === null) {
+      return (
         <LoginForm
           handleSubmit={handleLogin}
           setUsername={setUsername}
@@ -154,27 +171,30 @@ const App = () => {
 
   return (
     <div>
-      <Alert alert={alert} />
+      <Notification />
       {!user && loginForm()}
-      {user && <div>
-        <h2>blogs</h2>
-        <p>
-          {user.name} logged in <button onClick={handleLogout}>logout</button>
-        </p>
+      {user && (
+        <div>
+          <h2>blogs</h2>
+          <p>
+            {user.name} logged in <button onClick={handleLogout}>logout</button>
+          </p>
 
-        <Togglable buttonLabel='new blog' ref={blogFormRef}>
-          <BlogForm createBlog={createBlog} setAlert={setAlert} />
-        </Togglable>
+          <Togglable buttonLabel="new blog" ref={blogFormRef}>
+            <BlogForm createBlog={createBlog} />
+          </Togglable>
 
-        {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog}
-            updateBlog={updateBlog}
-            removeBlog={removeBlog}
-            username={user.username}
-          />
-        )}
-      </div>
-      }
+          {blogs.map((blog) => (
+            <Blog
+              key={blog.id}
+              blog={blog}
+              updateBlog={updateBlog}
+              removeBlog={removeBlog}
+              username={user.username}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }
