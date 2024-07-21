@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import Blog from './components/Blog'
+import BlogList from './components/BlogList'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -9,33 +9,40 @@ import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 import Notification from './components/Notification'
 
-import { useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { setNotification } from './reducers/notificationReducer'
+import { initializeBlogs } from './reducers/blogReducer'
+import { initializeUser } from './reducers/userReducer'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
+  //const [blogs, setBlogs] = useState([])
+  const blogs = useSelector((state) => state.blogs)
+  const user = useSelector((state) => state.user)
+
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
+  //const [user, setUser] = useState(null)
   //const [alert, setAlert] = useState(null)
 
   const blogFormRef = useRef()
   const dispatch = useDispatch()
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBloglistAppUser')
+    /*const loggedUserJSON = window.localStorage.getItem('loggedBloglistAppUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
       blogService.setToken(user.token)
-    }
+    }*/
+    dispatch(initializeUser())
   }, [])
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => {
+    /*blogService.getAll().then((blogs) => {
       blogs.sort((a, b) => b.likes - a.likes)
       setBlogs(blogs)
-    })
+    })*/
+    dispatch(initializeBlogs())
   }, [])
 
   const handleLogin = async (event) => {
@@ -78,21 +85,23 @@ const App = () => {
     dispatch(setNotification(`Logged out ${user.name}`, 5))
   }
 
-  const createBlog = async (blogObject) => {
+  /*const createBlog = async (blogObject) => {
     try {
-      const createdBlog = await blogService.create(blogObject)
+      console.log('clicked', blogObject)
+      dispatch(createBlog(blogObject))
+      /*const createdBlog = await blogService.create(blogObject)
       const cblogs = await blogService.getAll()
       setBlogs(cblogs.sort((a, b) => b.likes - a.likes))
-      /*setAlert({
+      setAlert({
         message: `a new blog ${createdBlog.title} by ${createdBlog.author} added`,
         typeOfAlert: 'notification'
       })
       setTimeout(() => {
         setAlert(null)
-      }, 5000)*/
+      }, 5000)
       dispatch(
         setNotification(
-          `a new blog ${createdBlog.title} by ${createdBlog.author} added`,
+          `a new blog ${blogObject.title} by ${blogObject.author} added`,
           5
         )
       )
@@ -101,10 +110,10 @@ const App = () => {
       /*setAlert({ alert: exception.message, typeOfMessage: 'error' })
       setTimeout(() => {
         setAlert(null)
-      }, 5000)*/
+      }, 5000)
       dispatch(setNotification(exception.message, 5))
     }
-  }
+  }*/
 
   const updateBlog = async (id, blogObject) => {
     try {
@@ -133,7 +142,6 @@ const App = () => {
 
   const removeBlog = async (id) => {
     try {
-      console.log('the id ', id)
       const deletedBlog = await blogService.deleteBlog(id)
       const dblogs = await blogService.getAll()
 
@@ -179,20 +187,10 @@ const App = () => {
           <p>
             {user.name} logged in <button onClick={handleLogout}>logout</button>
           </p>
-
           <Togglable buttonLabel="new blog" ref={blogFormRef}>
-            <BlogForm createBlog={createBlog} />
+            <BlogForm />
           </Togglable>
-
-          {blogs.map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              updateBlog={updateBlog}
-              removeBlog={removeBlog}
-              username={user.username}
-            />
-          ))}
+          <BlogList user={user} />
         </div>
       )}
     </div>

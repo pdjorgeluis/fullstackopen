@@ -1,6 +1,14 @@
 import { useState } from 'react'
 
-const Blog = ({ blog, updateBlog, removeBlog, username }) => {
+import { useDispatch } from 'react-redux'
+import { updateBlog } from '../reducers/blogReducer'
+import { setNotification } from '../reducers/notificationReducer'
+import { deleteBlog } from '../reducers/blogReducer'
+import { updateVote } from '../reducers/blogReducer'
+
+import blogService from '../services/blogs' //quitar
+
+const Blog = ({ blog, user, onRemove }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -8,31 +16,25 @@ const Blog = ({ blog, updateBlog, removeBlog, username }) => {
     borderWidth: 1,
     marginBottom: 5,
   }
-
+  const dispatch = useDispatch()
   const [visible, setVisible] = useState(false)
   const showWhenVisible = { display: visible ? '' : 'none' }
 
   const handleLikes = (blogToUpdate) => {
-    const newBlog = {
-      title: blogToUpdate.title,
-      url: blogToUpdate.url,
-      likes: blogToUpdate.likes + 1,
-      user: {
-        username: blogToUpdate.user.username,
-        name: blogToUpdate.user.name,
-        _id: blogToUpdate.user.id,
-      },
-      author: blogToUpdate.author,
-      _id: blogToUpdate.id,
-    }
-
-    updateBlog(blogToUpdate.id, newBlog)
+    //const updatedBlog = await blogService.update(blogToUpdate.id, newBlog)
+    dispatch(updateVote(blogToUpdate.id, blogToUpdate))
   }
 
-  const handleRemove = (blog) => {
+  /* const handleRemove = (blog) => {
     console.log(blog.id)
     window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)
-      ? removeBlog(blog.id)
+      ? dispatch(deleteBlog(blog.id)) //removeBlog(blog.id)
+      : null
+  }*/
+
+  const handleRemove = (blog) => {
+    window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)
+      ? dispatch(deleteBlog(blog.id)) //removeBlog(blog.id)
       : null
   }
 
@@ -47,8 +49,8 @@ const Blog = ({ blog, updateBlog, removeBlog, username }) => {
           {blog.url} <br />
           {blog.likes} <button onClick={() => handleLikes(blog)}>like</button>
           <br />
-          {blog.user.username}
-          {blog.user.username === username ? (
+          {user._id}
+          {blog.user.username === user.username || blog.user === user.id ? (
             <button onClick={() => handleRemove(blog)}>remove</button>
           ) : null}
         </div>

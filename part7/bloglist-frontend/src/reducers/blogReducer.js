@@ -11,15 +11,21 @@ const blogSlice = createSlice({
     appendBlog(state, action) {
       state.push(action.payload)
     },
-    getBlogs(state, action) {
-      return state
+    removeBlog(state, action) {
+      const id = action.payload
+      return state.filter((blog) => blog.id !== id)
+    },
+    updateBlog(state, action) {
+      const newBlog = action.payload
+      return state.map((blog) => (blog.id !== newBlog.id ? blog : newBlog))
     },
   },
 })
 
-export const { setBlogs, appendBlog, getBlogs } = blogSlice.actions
+export const { setBlogs, appendBlog, removeBlog, updateBlog } =
+  blogSlice.actions
 
-export const inializeBlogs = () => {
+export const initializeBlogs = () => {
   return async (dispatch) => {
     const blogs = await blogService.getAll()
     dispatch(setBlogs(blogs))
@@ -33,24 +39,36 @@ export const createBlog = (blogObject) => {
   }
 }
 
-export const updateBlog = (id, newBlog) => {
+export const updateVote = (id, blogToUpdate) => {
   return async (dispatch) => {
-    //const blogToUpdate = blogs.find(n => n.id === id)
+    /*const blogToUpdate = blogs.find(n => n.id === id)
     const changedBlog = await blogService.update(id, newBlog)
     const newBlogs = dispatch(getBlogs()).map((blog) =>
       blog.id !== id ? blog : changedBlog
-    )
-    dispatch(setBlogs(newBlogs))
+    )*/
+
+    const newBlog = {
+      title: blogToUpdate.title,
+      url: blogToUpdate.url,
+      likes: blogToUpdate.likes + 1,
+      user: {
+        username: blogToUpdate.user.username,
+        name: blogToUpdate.user.name,
+        _id: blogToUpdate.user.id,
+      },
+      author: blogToUpdate.author,
+      _id: blogToUpdate.id,
+    }
+
+    await blogService.update(id, newBlog)
+    dispatch(updateBlog({ ...blogToUpdate, likes: blogToUpdate.likes + 1 }))
   }
 }
 
 export const deleteBlog = (id) => {
   return async (dispatch) => {
-    const deletedBlog = await blogService.deleteBlog(id)
-    const newBlogs = dispatch(getBlogs()).filter(
-      (blog) => blog.id !== deletedBlog.id
-    )
-    dispatch(setBlogs(newBlogs))
+    await blogService.deleteBlog(id)
+    dispatch(removeBlog(id))
   }
 }
 

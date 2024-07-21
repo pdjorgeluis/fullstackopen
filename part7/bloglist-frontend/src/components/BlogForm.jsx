@@ -1,9 +1,13 @@
 import { useState } from 'react'
+import { createBlog } from '../reducers/blogReducer'
+import { useDispatch } from 'react-redux'
+import { setNotification } from '../reducers/notificationReducer'
 
-const BlogForm = ({ createBlog, setAlert }) => {
+const BlogForm = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+  const dispatch = useDispatch()
 
   const handleCreate = (event) => {
     event.preventDefault()
@@ -13,17 +17,27 @@ const BlogForm = ({ createBlog, setAlert }) => {
         author: author,
         url: url,
       }
-
-      createBlog(blogObject)
-
+      //createBlog(blogObject)
+      try {
+        dispatch(createBlog(blogObject))
+        dispatch(
+          setNotification(
+            `a new blog ${blogObject.title} by ${blogObject.author} added`,
+            5
+          )
+        )
+      } catch (exception) {
+        dispatch(setNotification(exception.message, 5))
+      }
       setTitle('')
       setAuthor('')
       setUrl('')
     } else {
-      setAlert({ message: 'fill all the fields', typeOfAlert: 'error' })
+      console.log('failed')
+      /*setAlert({ message: 'fill all the fields', typeOfAlert: 'error' })
       setTimeout(() => {
         setAlert(null)
-      }, 5000)
+      }, 5000)*/
     }
   }
 
@@ -59,9 +73,7 @@ const BlogForm = ({ createBlog, setAlert }) => {
             onChange={({ target }) => setUrl(target.value)}
           />{' '}
           <br />
-          <button id="button-create" onClick={handleCreate}>
-            create
-          </button>
+          <button id="button-create">create</button>
         </div>
       </form>
     </div>
