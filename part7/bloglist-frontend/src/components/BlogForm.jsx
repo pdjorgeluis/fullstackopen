@@ -6,14 +6,12 @@ const BlogForm = ({ createBlog, setAlert }) => {
   const [url, setUrl] = useState('')
 
   const handleCreate = (event) => {
-
     event.preventDefault()
-    if (title && author && url){
-
+    if (title && author && url) {
       const blogObject = {
         title: title,
         author: author,
-        url: url
+        url: url,
       }
 
       createBlog(blogObject)
@@ -21,7 +19,7 @@ const BlogForm = ({ createBlog, setAlert }) => {
       setTitle('')
       setAuthor('')
       setUrl('')
-    }else{
+    } else {
       setAlert({ message: 'fill all the fields', typeOfAlert: 'error' })
       setTimeout(() => {
         setAlert(null)
@@ -29,36 +27,41 @@ const BlogForm = ({ createBlog, setAlert }) => {
     }
   }
 
-  return(
+  return (
     <div>
       <h2>create new</h2>
       <form onSubmit={handleCreate}>
         <div>
           title:
           <input
-            id='title'
-            type='text'
+            id="title"
+            type="text"
             value={title}
-            name='Title'
+            name="Title"
             onChange={({ target }) => setTitle(target.value)}
-          /> <br/>
-            author:
+          />{' '}
+          <br />
+          author:
           <input
-            id='author'
-            type='text'
+            id="author"
+            type="text"
             value={author}
-            name='Author'
+            name="Author"
             onChange={({ target }) => setAuthor(target.value)}
-          /> <br/>
-            url:
+          />{' '}
+          <br />
+          url:
           <input
-            id='url'
-            type='text'
+            id="url"
+            type="text"
             value={url}
-            name='Url'
+            name="Url"
             onChange={({ target }) => setUrl(target.value)}
-          /> <br/>
-          <button id='button-create' onClick={handleCreate}>create</button>
+          />{' '}
+          <br />
+          <button id="button-create" onClick={handleCreate}>
+            create
+          </button>
         </div>
       </form>
     </div>
