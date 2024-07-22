@@ -7,12 +7,41 @@ import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 import Notification from './components/Notification'
+import UserList from './components/UserList'
 
 import { useSelector, useDispatch } from 'react-redux'
 import { setNotification } from './reducers/notificationReducer'
 import { initializeBlogs } from './reducers/blogReducer'
 import { initializeUser } from './reducers/userReducer'
 import { setUser } from './reducers/userReducer'
+
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  Navigate,
+  useParams,
+  useNavigate,
+  useMatch,
+} from 'react-router-dom'
+
+const Menu = ({ user, onLogout }) => {
+  const padding = {
+    paddingRight: 5,
+  }
+  return (
+    <div>
+      <Link style={padding} to="/blogs">
+        blogs
+      </Link>
+      <Link style={padding} to="/users">
+        users
+      </Link>
+      {user.name} logged in <button onClick={onLogout}>logout</button>
+    </div>
+  )
+}
 
 const App = () => {
   const user = useSelector((state) => state.user)
@@ -80,13 +109,30 @@ const App = () => {
       {user && (
         <div>
           <h2>blogs</h2>
-          <p>
-            {user.name} logged in <button onClick={handleLogout}>logout</button>
-          </p>
-          <Togglable buttonLabel="new blog" ref={blogFormRef}>
-            <BlogForm />
-          </Togglable>
-          <BlogList user={user} />
+
+          <Menu user={user} onLogout={handleLogout} />
+          <Routes>
+            <Route
+              path="/blogs"
+              element={
+                <div>
+                  <Togglable buttonLabel="new blog" ref={blogFormRef}>
+                    <BlogForm />
+                  </Togglable>
+                  <BlogList user={user} />
+                </div>
+              }
+            />
+            <Route
+              path="/users"
+              element={
+                <div>
+                  <h2>Users</h2>
+                  <UserList />
+                </div>
+              }
+            />
+          </Routes>
         </div>
       )}
     </div>
