@@ -41,12 +41,6 @@ export const createBlog = (blogObject) => {
 
 export const updateVote = (id, blogToUpdate) => {
   return async (dispatch) => {
-    /*const blogToUpdate = blogs.find(n => n.id === id)
-    const changedBlog = await blogService.update(id, newBlog)
-    const newBlogs = dispatch(getBlogs()).map((blog) =>
-      blog.id !== id ? blog : changedBlog
-    )*/
-
     const newBlog = {
       title: blogToUpdate.title,
       url: blogToUpdate.url,

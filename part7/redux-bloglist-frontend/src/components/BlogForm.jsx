@@ -17,7 +17,6 @@ const BlogForm = () => {
         author: author,
         url: url,
       }
-      //createBlog(blogObject)
       try {
         dispatch(createBlog(blogObject))
         dispatch(
@@ -34,10 +33,7 @@ const BlogForm = () => {
       setUrl('')
     } else {
       console.log('failed')
-      /*setAlert({ message: 'fill all the fields', typeOfAlert: 'error' })
-      setTimeout(() => {
-        setAlert(null)
-      }, 5000)*/
+      dispatch(setNotification('fill all the fields', 5))
     }
   }
 

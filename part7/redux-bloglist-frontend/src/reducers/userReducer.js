@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit'
-import userService from '../services/login'
 import blogService from '../services/blogs'
 
 const userSlice = createSlice({
@@ -8,9 +7,6 @@ const userSlice = createSlice({
   reducers: {
     setUser(state, action) {
       return action.payload
-    },
-    appenUser(state, action) {
-      state.push(action.payload)
     },
   },
 })

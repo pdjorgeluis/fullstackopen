@@ -1,12 +1,9 @@
 import { useState } from 'react'
 
 import { useDispatch } from 'react-redux'
-import { updateBlog } from '../reducers/blogReducer'
 import { setNotification } from '../reducers/notificationReducer'
 import { deleteBlog } from '../reducers/blogReducer'
 import { updateVote } from '../reducers/blogReducer'
-
-import blogService from '../services/blogs' //quitar
 
 const Blog = ({ blog, user, onRemove }) => {
   const blogStyle = {
@@ -21,21 +18,25 @@ const Blog = ({ blog, user, onRemove }) => {
   const showWhenVisible = { display: visible ? '' : 'none' }
 
   const handleLikes = (blogToUpdate) => {
-    //const updatedBlog = await blogService.update(blogToUpdate.id, newBlog)
-    dispatch(updateVote(blogToUpdate.id, blogToUpdate))
+    try {
+      dispatch(updateVote(blogToUpdate.id, blogToUpdate))
+      dispatch(
+        setNotification(`likes in blog ${blogToUpdate.title} updated`, 5)
+      )
+    } catch (exception) {
+      dispatch(setNotification(exception.message, 5))
+    }
   }
 
-  /* const handleRemove = (blog) => {
-    console.log(blog.id)
-    window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)
-      ? dispatch(deleteBlog(blog.id)) //removeBlog(blog.id)
-      : null
-  }*/
-
   const handleRemove = (blog) => {
-    window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)
-      ? dispatch(deleteBlog(blog.id)) //removeBlog(blog.id)
-      : null
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
+      try {
+        dispatch(deleteBlog(blog.id))
+        dispatch(setNotification(`Removed blog ${blog.title}`, 5))
+      } catch (exception) {
+        dispatch(setNotification(exception.message, 5))
+      }
+    }
   }
 
   return (
