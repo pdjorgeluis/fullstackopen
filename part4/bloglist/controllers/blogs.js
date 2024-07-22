@@ -1,4 +1,5 @@
 const blogsRouter = require("express").Router();
+const { response } = require("express");
 const Blog = require("../models/blog");
 const User = require("../models/user");
 
@@ -37,6 +38,19 @@ blogsRouter.post("/", async (request, response, next) => {
   await user.save();
 
   response.status(201).json(savedBolg);
+});
+
+blogsRouter.post("/:id/comments", async (request, response, next) => {
+  const body = request.body;
+
+  if (!request.user) {
+    return response.status(401).json({ error: "invalid token" });
+  }
+
+  const doc = await Blog.findById(request.params.id);
+  doc.comments = doc.comments.concat(body.comment);
+  const savedBolg = await doc.save();
+  response.json(savedBolg);
 });
 
 blogsRouter.delete("/:id", async (request, response) => {

@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 import { useDispatch } from 'react-redux'
 import { setNotification } from '../reducers/notificationReducer'
-import { deleteBlog } from '../reducers/blogReducer'
+import { addComment, deleteBlog } from '../reducers/blogReducer'
 import { updateVote } from '../reducers/blogReducer'
 import { Link } from 'react-router-dom'
 
@@ -16,6 +16,7 @@ const Blog = ({ blog, user, scope }) => {
   }
   const dispatch = useDispatch()
   const [visible, setVisible] = useState(false)
+  const [comment, setComment] = useState('')
   const showWhenVisible = { display: visible ? '' : 'none' }
 
   const handleLikes = (blogToUpdate) => {
@@ -40,6 +41,19 @@ const Blog = ({ blog, user, scope }) => {
     }
   }
 
+  const handleComment = (event) => {
+    event.preventDefault()
+    if (comment) {
+      try {
+        dispatch(addComment(blog, { comment: comment }))
+        dispatch(setNotification(`Added comment to blog ${blog.title}`, 5))
+      } catch (exception) {
+        dispatch(setNotification(exception.message, 5))
+      }
+      setComment('')
+    }
+  }
+
   if (!blog) {
     return null
   } else if (scope === 'ROUTES') {
@@ -56,6 +70,18 @@ const Blog = ({ blog, user, scope }) => {
             {blog.user.username === user.username || blog.user === user.id ? (
               <button onClick={() => handleRemove(blog)}>remove</button>
             ) : null}
+            <h3>comments</h3>
+            <form onSubmit={handleComment}>
+              <input
+                id="comment"
+                value={comment}
+                onChange={({ target }) => setComment(target.value)}
+              />
+              <button id="botton-comment">add comment</button>
+            </form>
+            {blog.comments.map((comment) => (
+              <li>{comment}</li>
+            ))}
           </div>
         </div>
       </div>
