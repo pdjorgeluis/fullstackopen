@@ -4,8 +4,9 @@ import { useDispatch } from 'react-redux'
 import { setNotification } from '../reducers/notificationReducer'
 import { deleteBlog } from '../reducers/blogReducer'
 import { updateVote } from '../reducers/blogReducer'
+import { Link } from 'react-router-dom'
 
-const Blog = ({ blog, user, onRemove }) => {
+const Blog = ({ blog, user, scope }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -39,10 +40,34 @@ const Blog = ({ blog, user, onRemove }) => {
     }
   }
 
+  if (!blog) {
+    return null
+  } else if (scope === 'ROUTES') {
+    return (
+      <div>
+        <div className="blog">
+          <h2>{blog.title}</h2>
+          <a href={blog.url}>{blog.url}</a>
+          <br />
+          {blog.likes} <button onClick={() => handleLikes(blog)}>like</button>
+          <br />
+          added by {blog.author}
+          <div>
+            {blog.user.username === user.username || blog.user === user.id ? (
+              <button onClick={() => handleRemove(blog)}>remove</button>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div style={blogStyle}>
       <div className="blog">
-        {blog.title} by {blog.author}
+        <Link to={`/blogs/${blog.id}`}>
+          {blog.title} by {blog.author}
+        </Link>
         <button onClick={() => setVisible(!visible)}>
           {visible ? 'hide' : 'view'}
         </button>
@@ -50,7 +75,6 @@ const Blog = ({ blog, user, onRemove }) => {
           {blog.url} <br />
           {blog.likes} <button onClick={() => handleLikes(blog)}>like</button>
           <br />
-          {user._id}
           {blog.user.username === user.username || blog.user === user.id ? (
             <button onClick={() => handleRemove(blog)}>remove</button>
           ) : null}

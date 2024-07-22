@@ -25,13 +25,14 @@ import {
   useNavigate,
   useMatch,
 } from 'react-router-dom'
+import Blog from './components/Blog'
 
 const Menu = ({ user, onLogout }) => {
   const padding = {
     paddingRight: 5,
   }
   return (
-    <div>
+    <div style={{ backgroundColor: 'lightgrey' }}>
       <Link style={padding} to="/blogs">
         blogs
       </Link>
@@ -43,8 +44,21 @@ const Menu = ({ user, onLogout }) => {
   )
 }
 
+const SelectedUser = ({ selectedUser }) => {
+  return (
+    <div>
+      <h2>{selectedUser.name}</h2>
+      <h3>added blogs</h3>
+      {selectedUser.blogs.length
+        ? selectedUser.blogs.map((blog) => <li key={blog.id}>{blog.title}</li>)
+        : 'No blogs added'}
+    </div>
+  )
+}
+
 const App = () => {
   const user = useSelector((state) => state.user)
+  const blogs = useSelector((state) => state.blogs)
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -70,7 +84,7 @@ const App = () => {
         JSON.stringify(user)
       )
       blogService.setToken(user.token)
-      setUser(user)
+      setUser({ ...user, loggedUser: user })
       setUsername('')
       setPassword('')
       dispatch(setNotification(`Logged in ${user.name}`, 5))
@@ -81,11 +95,12 @@ const App = () => {
   }
 
   const handleLogout = () => {
+    //Check this function
     window.localStorage.removeItem('loggedBloglistAppUser')
     setUser(null)
     setUsername('')
     setPassword('')
-    dispatch(setNotification(`Logged out ${user.name}`, 5))
+    dispatch(setNotification(`Logged out ${user.loggedUser.name}`, 5))
   }
 
   const loginForm = () => {
@@ -102,6 +117,35 @@ const App = () => {
     }
   }
 
+  const displayUsers = () => {
+    if (user !== null) {
+      if (user.userList !== null) {
+        return <UserList userList={user.userList} />
+      }
+    }
+    return <div>No users</div>
+  }
+  /*
+  const match = useMatch('/users/:id')
+  let selectedUser
+  if (user.userList) {
+    console.log(match)
+    selectedUser = match
+      ? user.userList.find((u) => u.id === match.params.id)
+      : null
+  }*/
+
+  const userMatch = useMatch('/users/:id')
+  const blogMatch = useMatch('/blogs/:id')
+
+  const selectedUser = userMatch
+    ? user.userList.find((u) => u.id === userMatch.params.id)
+    : null
+
+  const selectedBlog = blogMatch
+    ? blogs.find((b) => b.id === blogMatch.params.id)
+    : null
+
   return (
     <div>
       <Notification />
@@ -110,7 +154,7 @@ const App = () => {
         <div>
           <h2>blogs</h2>
 
-          <Menu user={user} onLogout={handleLogout} />
+          <Menu user={user.loggedUser} onLogout={handleLogout} />
           <Routes>
             <Route
               path="/blogs"
@@ -119,7 +163,7 @@ const App = () => {
                   <Togglable buttonLabel="new blog" ref={blogFormRef}>
                     <BlogForm />
                   </Togglable>
-                  <BlogList user={user} />
+                  <BlogList user={user.loggedUser} />
                 </div>
               }
             />
@@ -128,8 +172,22 @@ const App = () => {
               element={
                 <div>
                   <h2>Users</h2>
-                  <UserList />
+                  {displayUsers()}
                 </div>
+              }
+            />
+            <Route
+              path="/users/:id"
+              element={<SelectedUser selectedUser={selectedUser} />}
+            />
+            <Route
+              path="/blogs/:id"
+              element={
+                <Blog
+                  blog={selectedBlog}
+                  user={user.loggedUser}
+                  scope="ROUTES"
+                />
               }
             />
           </Routes>

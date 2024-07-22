@@ -1,8 +1,15 @@
+import { Link } from 'react-router-dom'
+
 const User = ({ user }) => {
+  if (!user) {
+    return null
+  }
   return (
     <tr>
-      <td>{user.name}</td>
-      <td>{user.blogs}</td>
+      <td>
+        <Link to={`/users/${user.id}`}>{user.name}</Link>
+      </td>
+      <td>{user.blogs.length}</td>
     </tr>
   )
 }
