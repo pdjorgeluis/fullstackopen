@@ -1,8 +1,9 @@
 import User from './User'
+import { Table } from 'react-bootstrap'
 
 const UserList = ({ userList }) => {
   return (
-    <table>
+    <Table striped>
       <tbody>
         <tr>
           <th></th>
@@ -11,7 +12,7 @@ const UserList = ({ userList }) => {
         {userList &&
           userList.map((user) => <User key={user.username} user={user} />)}
       </tbody>
-    </table>
+    </Table>
   )
 }
 

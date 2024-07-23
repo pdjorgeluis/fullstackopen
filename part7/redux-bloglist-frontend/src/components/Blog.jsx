@@ -67,9 +67,10 @@ const Blog = ({ blog, user, scope }) => {
           <br />
           added by {blog.author}
           <div>
-            {blog.user.username === user.username || blog.user === user.id ? (
-              <button onClick={() => handleRemove(blog)}>remove</button>
-            ) : null}
+            {user &&
+            (blog.user.username === user.username || blog.user === user.id) ? (
+                <button onClick={() => handleRemove(blog)}>remove</button>
+              ) : null}
             <h3>comments</h3>
             <form onSubmit={handleComment}>
               <input
@@ -101,9 +102,10 @@ const Blog = ({ blog, user, scope }) => {
           {blog.url} <br />
           {blog.likes} <button onClick={() => handleLikes(blog)}>like</button>
           <br />
-          {blog.user.username === user.username || blog.user === user.id ? (
-            <button onClick={() => handleRemove(blog)}>remove</button>
-          ) : null}
+          {user &&
+          (blog.user.username === user.username || blog.user === user.id) ? (
+              <button onClick={() => handleRemove(blog)}>remove</button>
+            ) : null}
         </div>
       </div>
     </div>

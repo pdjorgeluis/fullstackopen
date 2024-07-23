@@ -20,9 +20,6 @@ import {
   Routes,
   Route,
   Link,
-  Navigate,
-  useParams,
-  useNavigate,
   useMatch,
 } from 'react-router-dom'
 import Blog from './components/Blog'
@@ -33,13 +30,17 @@ const Menu = ({ user, onLogout }) => {
   }
   return (
     <div style={{ backgroundColor: 'lightgrey' }}>
-      <Link style={padding} to="/blogs">
+      <Link style={padding} to="/">
         blogs
       </Link>
       <Link style={padding} to="/users">
         users
       </Link>
-      {user.name} logged in <button onClick={onLogout}>logout</button>
+      {user && (
+        <>
+          {user.name} logged in <button onClick={onLogout}>logout</button>
+        </>
+      )}
     </div>
   )
 }
@@ -78,16 +79,16 @@ const App = () => {
     event.preventDefault()
 
     try {
-      const user = await loginService.login({ username, password })
+      const userToLogIn = await loginService.login({ username, password })
       window.localStorage.setItem(
         'loggedBloglistAppUser',
-        JSON.stringify(user)
+        JSON.stringify(userToLogIn)
       )
-      blogService.setToken(user.token)
-      setUser({ ...user, loggedUser: user })
+      blogService.setToken(userToLogIn.token)
+      dispatch(setUser({ ...user, loggedUser: userToLogIn }))
       setUsername('')
       setPassword('')
-      dispatch(setNotification(`Logged in ${user.name}`, 5))
+      dispatch(setNotification(`${userToLogIn.name} logged in`, 5))
     } catch (exception) {
       console.log(exception.message)
       dispatch(setNotification('wrong credentials', 5))
@@ -95,16 +96,15 @@ const App = () => {
   }
 
   const handleLogout = () => {
-    //Check this function
     window.localStorage.removeItem('loggedBloglistAppUser')
-    setUser(null)
+    dispatch(setUser({ ...user, loggedUser: null }))
     setUsername('')
     setPassword('')
     dispatch(setNotification(`Logged out ${user.loggedUser.name}`, 5))
   }
 
   const loginForm = () => {
-    if (user === null) {
+    if (user && user.loggedUser === null) {
       return (
         <LoginForm
           handleSubmit={handleLogin}
@@ -125,15 +125,6 @@ const App = () => {
     }
     return <div>No users</div>
   }
-  /*
-  const match = useMatch('/users/:id')
-  let selectedUser
-  if (user.userList) {
-    console.log(match)
-    selectedUser = match
-      ? user.userList.find((u) => u.id === match.params.id)
-      : null
-  }*/
 
   const userMatch = useMatch('/users/:id')
   const blogMatch = useMatch('/blogs/:id')
@@ -147,17 +138,16 @@ const App = () => {
     : null
 
   return (
-    <div>
+    <div className="container">
       <Notification />
-      {!user && loginForm()}
-      {user && (
+      {user && !user.loggedUser && loginForm()}
+      {user && user.loggedUser && (
         <div>
           <h2>blogs</h2>
-
           <Menu user={user.loggedUser} onLogout={handleLogout} />
           <Routes>
             <Route
-              path="/blogs"
+              path="/"
               element={
                 <div>
                   <Togglable buttonLabel="new blog" ref={blogFormRef}>
