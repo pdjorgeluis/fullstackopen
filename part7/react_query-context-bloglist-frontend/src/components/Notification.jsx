@@ -1,3 +1,4 @@
+import { Alert } from '@mui/material'
 import { useNotificationText } from '../NotificationContext'
 
 const Notification = () => {
@@ -13,7 +14,11 @@ const Notification = () => {
       }
       : { display: 'none' }
 
-  return <div style={style}>{notification}</div>
+  return (
+    <Alert severity="info" style={style}>
+      {notification}
+    </Alert>
+  )
 }
 
 export default Notification

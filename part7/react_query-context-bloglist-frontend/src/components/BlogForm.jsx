@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNotificationDispatch } from '../NotificationContext'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import blogService from '../services/blogs'
+import { TextField, Button } from '@mui/material'
 
 const BlogForm = () => {
   const [title, setTitle] = useState('')
@@ -60,36 +61,42 @@ const BlogForm = () => {
       <h2>create new</h2>
       <form onSubmit={handleCreate}>
         <div>
-          title:
-          <input
+          <TextField
+            label="title"
             id="title"
             type="text"
             value={title}
             name="Title"
             onChange={({ target }) => setTitle(target.value)}
-          />{' '}
+          />
           <br />
-          author:
-          <input
+          <TextField
+            label="author"
             id="author"
             type="text"
             value={author}
             name="Author"
             onChange={({ target }) => setAuthor(target.value)}
-          />{' '}
+          />
           <br />
-          url:
-          <input
+          <TextField
+            label="url"
             id="url"
             type="text"
             value={url}
             name="Url"
             onChange={({ target }) => setUrl(target.value)}
-          />{' '}
+          />
           <br />
-          <button id="button-create" onClick={handleCreate}>
+          <Button
+            variant="contained"
+            color="primary"
+            type="submit"
+            id="button-create"
+            onClick={handleCreate}
+          >
             create
-          </button>
+          </Button>
         </div>
       </form>
     </div>

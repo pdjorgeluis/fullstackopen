@@ -3,9 +3,17 @@ import { useNotificationDispatch } from './NotificationContext'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useUserDispatch, useUserValue } from './UserContext'
 
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useMatch,
+} from 'react-router-dom'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import userService from './services/users'
 
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
@@ -13,18 +21,66 @@ import Togglable from './components/Togglable'
 
 import Notification from './components/Notification'
 
+import {
+  Container,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  TableContainer,
+  Paper,
+  TableHead,
+} from '@mui/material'
+
+const Menu = ({ user, onLogout }) => {
+  const padding = {
+    paddingRight: 5,
+  }
+  return (
+    <div style={{ backgroundColor: 'lightgrey' }}>
+      <Link style={padding} to="/">
+        blogs
+      </Link>
+      <Link style={padding} to="/users">
+        users
+      </Link>
+      {user && (
+        <>
+          {user.name} logged in <button onClick={onLogout}>logout</button>
+        </>
+      )}
+    </div>
+  )
+}
+
+const SelectedUser = ({ selectedUser }) => {
+  if (!selectedUser) {
+    return null
+  }
+  return (
+    <div>
+      <h2>{selectedUser.name}</h2>
+      <h3>added blogs</h3>
+      {selectedUser.blogs.length
+        ? selectedUser.blogs.map((blog) => <li key={blog.id}>{blog.title}</li>)
+        : 'No blogs added'}
+    </div>
+  )
+}
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  //const [user, setUser] = useState(null)
+  const [userList, setUserList] = useState([])
 
-  //const queryClient = useQueryClient()
   const dispatchNotification = useNotificationDispatch()
   const user = useUserValue()
   const dispatchUser = useUserDispatch()
 
   const blogFormRef = useRef()
+
+  const userMatch = useMatch('/users/:id')
+  const blogMatch = useMatch('/blogs/:id')
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBloglistAppUser')
@@ -33,6 +89,7 @@ const App = () => {
       dispatchUser({ type: 'SAVE', payload: userToLogIn })
       blogService.setToken(userToLogIn.token)
     }
+    userService.getAll().then((u) => setUserList(u))
   }, [])
 
   const result = useQuery({
@@ -43,10 +100,6 @@ const App = () => {
   })
 
   useEffect(() => {
-    /*blogService.getAll().then((blogs) => {
-      blogs.sort((a, b) => b.likes - a.likes)
-      setBlogs(blogs)
-    })*/
     if (result.data) setBlogs(result.data.sort((a, b) => b.likes - a.likes))
   }, [result])
 
@@ -87,70 +140,6 @@ const App = () => {
     }, 5000)
   }
 
-  /*  const createBlog = async (blogObject) => {
-     try {
-      const createdBlog = await blogService.create(blogObject)
-      const cblogs = await blogService.getAll()
-      setBlogs(cblogs.sort((a, b) => b.likes - a.likes))
-      dispatchNotification({
-        type: 'SHOW',
-        payload: `a new blog ${createdBlog.title} by ${createdBlog.author} added`,
-      })
-      setTimeout(() => {
-        dispatchNotification({ type: 'HIDE' })
-      }, 5000)
-    } catch (exception) {
-      console.log(exception.message)
-      dispatchNotification({ type: 'SHOW', payload: exception.message })
-      setTimeout(() => {
-        dispatchNotification({ type: 'HIDE' })
-      }, 5000)
-    }
-  }*/
-
-  /*const updateBlog = async (id, blogObject) => {
-    try {
-      const updatedBlog = await blogService.update(id, blogObject)
-
-      const ublogs = await blogService.getAll()
-      setBlogs(ublogs.sort((a, b) => b.likes - a.likes))
-      dispatchNotification({
-        type: 'SHOW',
-        payload: `likes in blog ${updatedBlog.title} updated`,
-      })
-      setTimeout(() => {
-        dispatchNotification({ type: 'HIDE' })
-      }, 5000)
-    } catch (exception) {
-      dispatchNotification({ type: 'SHOW', payload: exception.message })
-      setTimeout(() => {
-        dispatchNotification({ type: 'HIDE' })
-      }, 5000)
-    }
-  }
-
-  const removeBlog = async (id) => {
-    try {
-      console.log('the id ', id)
-      const deletedBlog = await blogService.deleteBlog(id)
-      const dblogs = await blogService.getAll()
-
-      setBlogs(dblogs.sort((a, b) => b.likes - a.likes))
-      dispatchNotification({
-        type: 'SHOW',
-        payload: `Removed blog ${deletedBlog.title}`,
-      })
-      setTimeout(() => {
-        dispatchNotification({ type: 'HIDE' })
-      }, 5000)
-    } catch (exception) {
-      dispatchNotification({ type: 'SHOW', payload: exception.message })
-      setTimeout(() => {
-        dispatchNotification({ type: 'HIDE' })
-      }, 5000)
-    }
-  }*/
-
   const loginForm = () => {
     if (user === null) {
       return (
@@ -164,6 +153,44 @@ const App = () => {
       )
     }
   }
+
+  const displayUsers = () => {
+    if (user !== null) {
+      if (userList !== null) {
+        return (
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell>blogs created</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {userList.map((user) => (
+                  <TableRow key={user.username}>
+                    <TableCell>
+                      <Link to={`/users/${user.id}`}>{user.name}</Link>
+                    </TableCell>
+                    <TableCell>{user.blogs.length}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )
+      }
+      return <div>No users</div>
+    }
+  }
+
+  const selectedUser = userMatch
+    ? userList.find((u) => u.id === userMatch.params.id)
+    : null
+
+  const selectedBlog = blogMatch
+    ? blogs.find((b) => b.id === blogMatch.params.id)
+    : null
 
   if (result.isLoading) {
     return <div>loading data...</div>
@@ -179,29 +206,66 @@ const App = () => {
     )
   }
 
-  //const blogsFromQuery = result.data
-
   return (
-    <div>
-      <Notification />
-      {!user && loginForm()}
-      {user && (
-        <div>
-          <h2>blogs</h2>
-          <p>
-            {user.name} logged in <button onClick={handleLogout}>logout</button>
-          </p>
-
-          <Togglable buttonLabel="new blog" ref={blogFormRef}>
-            <BlogForm />
-          </Togglable>
-
-          {blogs.map((blog) => (
-            <Blog key={blog.id} blog={blog} username={user.username} />
-          ))}
-        </div>
-      )}
-    </div>
+    <Container>
+      <div>
+        <Notification />
+        {!user && loginForm()}
+        {user && userList && (
+          <div>
+            <h2>blogs</h2>
+            <Menu user={user.name} onLogout={handleLogout} />
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <div>
+                    <Togglable buttonLabel="new blog" ref={blogFormRef}>
+                      <BlogForm />
+                    </Togglable>
+                    {blogs.map((blog) => (
+                      <div
+                        key={blog.id}
+                        style={{
+                          paddingTop: 10,
+                          paddingLeft: 2,
+                          border: 'solid',
+                          borderWidth: 1,
+                          marginBottom: 5,
+                        }}
+                      >
+                        <Link to={`/blogs/${blog.id}`}>
+                          {blog.title} by {blog.author}
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                }
+              />
+              <Route
+                path="/users"
+                element={
+                  <div>
+                    <h2>Users</h2>
+                    {displayUsers()}
+                  </div>
+                }
+              />
+              <Route
+                path="/users/:id"
+                element={<SelectedUser selectedUser={selectedUser} />}
+              />
+              <Route
+                path="/blogs/:id"
+                element={
+                  selectedBlog && <Blog blog={selectedBlog} user={user} />
+                }
+              />
+            </Routes>
+          </div>
+        )}
+      </div>
+    </Container>
   )
 }
 

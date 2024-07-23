@@ -3,7 +3,7 @@ import { useNotificationDispatch } from '../NotificationContext'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import blogService from '../services/blogs'
 
-const Blog = ({ blog, username }) => {
+const Blog = ({ blog, user }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -14,6 +14,7 @@ const Blog = ({ blog, username }) => {
 
   const queryClient = useQueryClient()
   const dispatchNotification = useNotificationDispatch()
+  const [comment, setComment] = useState('')
 
   const updateBlogMutation = useMutation({
     mutationFn: blogService.update,
@@ -43,8 +44,19 @@ const Blog = ({ blog, username }) => {
     },
   })
 
-  const [visible, setVisible] = useState(false)
-  const showWhenVisible = { display: visible ? '' : 'none' }
+  const addComment = useMutation({
+    mutationFn: blogService.addComment,
+    onSuccess: (updatedBlog) => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] })
+      dispatchNotification({
+        type: 'SHOW',
+        payload: `added comment in blog ${updatedBlog.title} `,
+      })
+      setTimeout(() => {
+        dispatchNotification({ type: 'HIDE' })
+      }, 5000)
+    },
+  })
 
   const handleLikes = (blogToUpdate) => {
     const newBlog = {
@@ -59,7 +71,6 @@ const Blog = ({ blog, username }) => {
       author: blogToUpdate.author,
       _id: blogToUpdate.id,
     }
-    console.log(newBlog)
     updateBlogMutation.mutate(newBlog)
   }
 
@@ -83,21 +94,47 @@ const Blog = ({ blog, username }) => {
     }
   }
 
+  const handleComment = (event) => {
+    event.preventDefault()
+    if (comment) {
+      try {
+        //blogService.addComment(blog.id, { comment: comment })
+        addComment.mutate({ id: blog.id, comment: comment })
+        //dispatch(setNotification(`Added comment to blog ${blog.title}`, 5))
+      } catch (exception) {
+        //dispatch(setNotification(exception.message, 5))
+      }
+      setComment('')
+    }
+  }
+
   return (
-    <div style={blogStyle}>
-      <div className="blog">
-        {blog.title} by {blog.author}
-        <button onClick={() => setVisible(!visible)}>
-          {visible ? 'hide' : 'view'}
-        </button>
-        <div className="blogDetails" style={showWhenVisible}>
-          {blog.url} <br />
-          {blog.likes} <button onClick={() => handleLikes(blog)}>like</button>
-          <br />
-          {blog.user.username}
-          {blog.user.username === username ? (
-            <button onClick={() => handleRemove(blog)}>remove</button>
-          ) : null}
+    <div>
+      <div>
+        <h2>{blog.title}</h2>
+        <a href={blog.url}>{blog.url}</a>
+        <br />
+        {blog.likes} <button onClick={() => handleLikes(blog)}>like</button>
+        <br />
+        added by {blog.author}
+        <div>
+          {blog.user.username === user.username
+            ? blog.user === user.id || (
+              <button onClick={() => handleRemove(blog)}>remove</button>
+            )
+            : null}
+          <h3>comments</h3>
+          <form onSubmit={handleComment}>
+            <input
+              id="comment"
+              value={comment}
+              onChange={({ target }) => setComment(target.value)}
+            />
+            <button id="botton-comment">add comment</button>
+          </form>
+          {blog.comments.map((comment) => (
+            <li key={Math.random * 1000}>{comment}</li>
+          ))}
         </div>
       </div>
     </div>
