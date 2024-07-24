@@ -35,26 +35,25 @@ export const initializeBlogs = () => {
 export const createBlog = (blogObject) => {
   return async (dispatch) => {
     const newBlog = await blogService.create(blogObject)
+
     dispatch(appendBlog(newBlog))
   }
 }
 
 export const updateVote = (id, blogToUpdate) => {
   return async (dispatch) => {
+    const id = !blogToUpdate.user.id ? blogToUpdate.user : blogToUpdate.user.id
     const newBlog = {
       title: blogToUpdate.title,
       url: blogToUpdate.url,
       likes: blogToUpdate.likes + 1,
-      user: {
-        username: blogToUpdate.user.username,
-        name: blogToUpdate.user.name,
-        _id: blogToUpdate.user.id,
-      },
+      user: id,
       author: blogToUpdate.author,
       _id: blogToUpdate.id,
+      comments: [...blogToUpdate.comments],
     }
-
     await blogService.update(id, newBlog)
+
     dispatch(updateBlog({ ...blogToUpdate, likes: blogToUpdate.likes + 1 }))
   }
 }
@@ -76,7 +75,6 @@ export const addComment = (blogToUpdate, newComment) => {
         comments: blogToUpdate.comments.concat(newComment.comment),
       })
     )
-    console.log(blogToUpdate.comments[blogToUpdate.comments.length - 1])
   }
 }
 

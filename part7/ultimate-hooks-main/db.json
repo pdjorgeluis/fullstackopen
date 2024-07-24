@@ -7,6 +7,10 @@
     {
       "id": 2,
       "content": "best feature ever <3"
+    },
+    {
+      "content": "another note!!",
+      "id": 3
     }
   ],
   "persons": [
@@ -19,6 +23,11 @@
       "id": 2,
       "name": "hellas",
       "number": "012-123123"
+    },
+    {
+      "name": "Jorge Luis",
+      "number": "786-4579818",
+      "id": 3
     }
   ]
 }

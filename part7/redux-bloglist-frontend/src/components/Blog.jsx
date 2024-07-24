@@ -1,10 +1,9 @@
 import { useState } from 'react'
-
 import { useDispatch } from 'react-redux'
 import { setNotification } from '../reducers/notificationReducer'
 import { addComment, deleteBlog } from '../reducers/blogReducer'
 import { updateVote } from '../reducers/blogReducer'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 const Blog = ({ blog, user, scope }) => {
   const blogStyle = {
@@ -18,6 +17,7 @@ const Blog = ({ blog, user, scope }) => {
   const [visible, setVisible] = useState(false)
   const [comment, setComment] = useState('')
   const showWhenVisible = { display: visible ? '' : 'none' }
+  const navigate = useNavigate()
 
   const handleLikes = (blogToUpdate) => {
     try {
@@ -35,6 +35,7 @@ const Blog = ({ blog, user, scope }) => {
       try {
         dispatch(deleteBlog(blog.id))
         dispatch(setNotification(`Removed blog ${blog.title}`, 5))
+        navigate('/')
       } catch (exception) {
         dispatch(setNotification(exception.message, 5))
       }
@@ -81,7 +82,7 @@ const Blog = ({ blog, user, scope }) => {
               <button id="botton-comment">add comment</button>
             </form>
             {blog.comments.map((comment) => (
-              <li>{comment}</li>
+              <li key={Math.random() * 1000}>{comment}</li>
             ))}
           </div>
         </div>

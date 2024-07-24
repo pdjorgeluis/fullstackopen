@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNotificationDispatch } from '../NotificationContext'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import blogService from '../services/blogs'
 
 const Blog = ({ blog, user }) => {
@@ -15,6 +16,7 @@ const Blog = ({ blog, user }) => {
   const queryClient = useQueryClient()
   const dispatchNotification = useNotificationDispatch()
   const [comment, setComment] = useState('')
+  const navigate = useNavigate()
 
   const updateBlogMutation = useMutation({
     mutationFn: blogService.update,
@@ -82,6 +84,7 @@ const Blog = ({ blog, user }) => {
           type: 'SHOW',
           payload: `Removed blog ${blog.title}`,
         })
+        navigate('/')
         setTimeout(() => {
           dispatchNotification({ type: 'HIDE' })
         }, 5000)
@@ -98,11 +101,19 @@ const Blog = ({ blog, user }) => {
     event.preventDefault()
     if (comment) {
       try {
-        //blogService.addComment(blog.id, { comment: comment })
         addComment.mutate({ id: blog.id, comment: comment })
-        //dispatch(setNotification(`Added comment to blog ${blog.title}`, 5))
+        dispatchNotification({
+          type: 'SHOW',
+          payload: `Added comment to blog ${blog.title}`,
+        })
+        setTimeout(() => {
+          dispatchNotification({ type: 'HIDE' })
+        }, 5000)
       } catch (exception) {
-        //dispatch(setNotification(exception.message, 5))
+        dispatchNotification({ type: 'SHOW', payload: exception.message })
+        setTimeout(() => {
+          dispatchNotification({ type: 'HIDE' })
+        }, 5000)
       }
       setComment('')
     }
@@ -133,7 +144,7 @@ const Blog = ({ blog, user }) => {
             <button id="botton-comment">add comment</button>
           </form>
           {blog.comments.map((comment) => (
-            <li key={Math.random * 1000}>{comment}</li>
+            <li key={Math.random() * 1000}>{comment}</li>
           ))}
         </div>
       </div>

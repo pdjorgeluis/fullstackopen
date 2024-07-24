@@ -1,96 +1,95 @@
-import { useState, useEffect } from 'react'
-import axios from 'axios'
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 const useField = (type) => {
-  const [value, setValue] = useState('')
+  const [value, setValue] = useState("");
 
   const onChange = (event) => {
-    setValue(event.target.value)
-  }
+    setValue(event.target.value);
+  };
 
   return {
     type,
     value,
-    onChange
-  }
-}
+    onChange,
+  };
+};
 
 const useResource = (baseUrl) => {
-  const [resources, setResources] = useState([])
-  let token = null
-  const setToken = newToken => {
-    token = `bearer ${newToken}`
-  }
+  const [resources, setResources] = useState([]);
+  let token = null;
+  const setToken = (newToken) => {
+    token = `bearer ${newToken}`;
+  };
 
   useEffect(() => {
-    if(baseUrl !== '') {
-      getAll()
+    if (baseUrl !== "") {
+      getAll();
     }
-  },[])
+  }, []);
 
   const getAll = async () => {
     try {
-      const response = await axios.get(baseUrl)
-      setResources(response.data)
+      const response = await axios.get(baseUrl);
+      setResources(response.data);
     } catch (error) {
       console.log(error.message);
     }
-    //return response.data
-  }
+  };
 
   const create = async (resource) => {
     const config = {
       headers: { Authorization: token },
-    }
+    };
 
     try {
-      const response = await axios.post(baseUrl, resource, config)
-      setResources(resources.concat(response.data))
+      const response = await axios.post(baseUrl, resource, config);
+      setResources(resources.concat(response.data));
     } catch (error) {
       console.log(error.message);
     }
-    //return response.data
-  }
+  };
 
   const update = async (id, resource) => {
     try {
-         const response = await axios.put(`${ baseUrl }/${id}`, resource)
-      setResources(resources.map(resource => resource.id !== response.data ? resource : response.data))
+      const response = await axios.put(`${baseUrl}/${id}`, resource);
+      setResources(
+        resources.map((resource) =>
+          resource.id !== response.data ? resource : response.data
+        )
+      );
     } catch (error) {
       console.log(error.message);
     }
-    //return response.data
-  }
+  };
 
   const service = {
     setToken,
     getAll,
     create,
-    update
-  }
+    update,
+  };
 
-  return [
-    resources, service
-  ]
-}
+  return [resources, service];
+};
 
 const App = () => {
-  const content = useField('text')
-  const name = useField('text')
-  const number = useField('text')
+  const content = useField("text");
+  const name = useField("text");
+  const number = useField("text");
 
-  const [notes, noteService] = useResource('http://localhost:3005/notes')
-  const [persons, personService] = useResource('http://localhost:3005/persons')
+  const [notes, noteService] = useResource("http://localhost:3005/notes");
+  const [persons, personService] = useResource("http://localhost:3005/persons");
 
   const handleNoteSubmit = (event) => {
-    event.preventDefault()
-    noteService.create({ content: content.value })
-  }
- 
+    event.preventDefault();
+    noteService.create({ content: content.value });
+  };
+
   const handlePersonSubmit = (event) => {
-    event.preventDefault()
-    personService.create({ name: name.value, number: number.value})
-  }
+    event.preventDefault();
+    personService.create({ name: name.value, number: number.value });
+  };
 
   return (
     <div>
@@ -99,17 +98,23 @@ const App = () => {
         <input {...content} />
         <button>create</button>
       </form>
-      {notes.map(n => <p key={n.id}>{n.content}</p>)}
+      {notes.map((n) => (
+        <p key={n.id}>{n.content}</p>
+      ))}
 
       <h2>persons</h2>
       <form onSubmit={handlePersonSubmit}>
-        name <input {...name} /> <br/>
+        name <input {...name} /> <br />
         number <input {...number} />
         <button>create</button>
       </form>
-      {persons.map(n => <p key={n.id}>{n.name} {n.number}</p>)}
+      {persons.map((n) => (
+        <p key={n.id}>
+          {n.name} {n.number}
+        </p>
+      ))}
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;

@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { NotificationContextProvider } from './NotificationContext'
 import { UserContextProvider } from './UserContext'
 import App from './App'
-import './index.css'
 import { BrowserRouter as Router } from 'react-router-dom'
 
 const queryClient = new QueryClient()
